@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Fuel India</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmlzHf0GLavt3zqiQBKTicqtfmqQp_-Yk&libraries=places">
+    </script>
+</head>
+
+<body ng-app="myApp" ng-controller="myCtrl">
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Fuel India</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {{ CurrentLocation.name }}
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li ng-repeat="x in states">
+                            <a style="cursor: pointer;" ng-click="changeLocation(x);">{{x.name}}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <div class="container-fluid">
+            <div class="col-sm-12 col-md-12 col-lg-12 padding-none">
+                <div class="fuel-container col-sm-6 col-md-6 col-lg-6">
+                    <div class="col-sm-12 col-md-12 col-lg-12 fuel-inner">
+                        <div class="col-sm-12 col-md-12 col-lg-12 fuel-header">
+                            <strong>Petrol Prices for {{ CurrentLocation.name }}</strong>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 fuel-content">
+                            <div ng-if="showLoading" class="loading col-sm-12 col-md-12 col-lg-12 loading-div"></div>
+                            <div ng-if="!showLoading && petrolPriceData.vendors.length < 1" class="loading-div"> No Data Available</div>
+                            <div ng-if="!showLoading" ng-repeat="vendor in petrolPriceData.vendors" class="col-sm-12 col-md-12 col-lg-12 vendor-div">
+                                <!-- ngif border bottom -->
+                                <div class="vendor-header">
+                                    <strong title="Vendor">{{ vendor.name }}</strong>
+                                </div>
+                                <div ng-repeat="cities in vendor.data" class="col-sm-12 col-md-12 col-lg-12 vendor-content">
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner" title="City">{{ cities.city }}</div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner" title="Today's price">&#8377;{{ cities.price }}</div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner">
+                                        <span class="price-change-span" title="Change in price">
+                                            &#8377; {{ cities.change }}
+                                            <i ng-if="cities.change.includes('-')" class="material-icons" style="color: red;">
+                                                arrow_drop_down
+                                            </i>
+                                            <i ng-if="cities.change.includes('+')" class="material-icons" style="color: green;">
+                                                arrow_drop_up
+                                            </i>
+                                            <!-- <i ng-if="!cities.change.includes('-') && !cities.change.includes('+')" class="material-icons" style="color: red;">
+                                                        arrow_drop_down
+                                                    </i> -->
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fuel-container col-sm-6 col-md-6 col-lg-6">
+                    <div class="col-sm-12 col-md-12 col-lg-12 fuel-inner">
+                        <div class="col-sm-12 col-md-12 col-lg-12 fuel-header">
+                            <strong>Diesel Prices for {{ CurrentLocation.name }}</strong>
+                        </div>
+                        <div class="col-sm-12 col-md-12 col-lg-12 fuel-content">
+                            <div ng-if="showLoading" class="loading col-sm-12 col-md-12 col-lg-12 loading-div"></div>
+                            <div ng-if="!showLoading && petrolPriceData.vendors.length < 1" class="loading-div"> No Data Available</div>
+                            <div ng-if="!showLoading" ng-repeat="vendor in dieselPriceData.vendors" class="col-sm-12 col-md-12 col-lg-12 vendor-div">
+                                <!-- ngif border bottom -->
+                                <div class="vendor-header">
+                                    <strong title="Vendor">{{ vendor.name }}</strong>
+                                </div>
+                                <div ng-repeat="cities in vendor.data" class="col-sm-12 col-md-12 col-lg-12 vendor-content">
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner" title="City">{{ cities.city }}</div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner" title="Today's price">&#8377;{{ cities.price }}</div>
+                                    <div class="col-sm-4 col-md-4 col-lg-4 vendor-content-inner">
+                                        <span class="price-change-span" title="Change in price">
+                                            &#8377; {{ cities.change }}
+                                            <i ng-if="cities.change.includes('-')" class="material-icons" style="color: red;">
+                                                arrow_drop_down
+                                            </i>
+                                            <i ng-if="cities.change.includes('+')" class="material-icons" style="color: green;">
+                                                arrow_drop_up
+                                            </i>
+                                            <!-- <i ng-if="!cities.change.includes('-') && !cities.change.includes('+')" class="material-icons" style="color: red;">
+                                                            arrow_drop_down
+                                                        </i> -->
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-12 col-lg-12 padding-none">
+                <div class=" margin-btm-1" ng-class="{'col-sm-6 col-md-6 col-lg-6': selectedPlace != undefined, 'col-sm-12 col-md-12 col-lg-12': selectedPlace == undefined}">
+                    <div class="map-header">
+                        Nearby Gas stations (Your Location)
+                    </div>
+                    <div class="map-content" id="map">
+                    </div>
+                </div>
+                <div ng-if="selectedPlace != undefined" class="col-sm-6 col-md-6 col-lg-6 margin-btm-1">
+                    <div class="map-header place-details-header">
+                        <span>{{ selectedPlace.name }}</span>
+                        <span style="display: flex; align-items: center; align-items: center;" ng-class="{'label label-success': selectedPlace.opening_hours.open_now, 'label label-danger': !selectedPlace.opening_hours.open_now}">
+                            {{ selectedPlace.opening_hours.open_now ? "Open now" : "Closed" }}
+                        </span>
+                    </div>
+                    <div class="map-content">
+                        <div class="container-fluid">
+                            <div class="detail-common-div space-between">
+                                <span>
+                                    <strong>Rating</strong>
+                                </span>
+                                <span ng-if="selectedPlace.rating != undefined">
+                                    <strong>{{ selectedPlace.rating }}</strong>
+                                </span>
+                                <span ng-if="selectedPlace.rating == undefined">
+                                    <em>Not Available</em>
+                                </span>
+                            </div>
+                            <div class="detail-common-div">
+                                <fieldset>
+                                    <legend>
+                                        <strong>Timings</strong>
+                                    </legend>
+                                    <div ng-if="selectedPlace.opening_hours.weekday_text != undefined">
+                                        <div ng-repeat="time in selectedPlace.opening_hours.weekday_text">
+                                            <span>{{ time }}</span>
+                                        </div>
+                                    </div>
+                                    <div ng-if="selectedPlace.opening_hours.weekday_text == undefined">
+                                        <em>Not Available</em>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="detail-common-div space-between row">
+                                <button data-toggle="modal" data-target="#picModal" class="btn-sm btn-md btn-primary col-sm-4 col-md-4 col-lg-4">Photos</button>
+                                <button data-toggle="modal" data-target="#revModal" class="btn-sm btn-md btn-success col-sm-4 col-md-4 col-lg-4">Reviews</button>
+                                <button ng-if="!routeNavigated" ng-click="showDirection();" class="btn-sm btn-md btn-info col-sm-4 col-md-4 col-lg-4">Navigate</button>
+                                <button ng-if="routeNavigated" ng-click="resetNearby();" class="btn-sm btn-md btn-warning col-sm-4 col-md-4 col-lg-4">Nearby</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Photos Modal -->
+                    <div class="modal fade" id="picModal" role="dialog">
+                        <div class="modal-dialog">
+
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Photos</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <ul ng-if="selectedPlace.picsUrl.length > 0">
+                                        <li class="col-sm-6 col-md-6 col-lg-6" ng-repeat="url in selectedPlace.picsUrl" style="list-style: none;padding-bottom:10px;">
+                                            <img class="img-responsive" width="200px" height="200px" src="{{ url }}" />
+                                        </li>
+                                    </ul>
+                                    <div ng-if="selectedPlace.picsUrl.length < 1">
+                                        <em>No Photos</em>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Reviews Modal -->
+                    <div class="modal fade" id="revModal" role="dialog">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Reviews</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div ng-if="selectedPlace.reviews != undefined">
+                                        <div ng-repeat="review in selectedPlace.reviews">
+                                            <span>
+                                                <strong>{{ review.author_name }}</strong>
+                                            </span>
+                                            <p>{{ review.text }}</p>
+                                        </div>
+                                    </div>
+                                    <div ng-if="selectedPlace.reviews == undefined">
+                                        <em>No Reviews</em>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="app.js"></script>
+
+<footer>
+    <h4>Developed by Sajid Shaikh</h4>
+</footer>
+
+</html>
