@@ -50,14 +50,14 @@ app.service('Map', function ($q, $rootScope, states) {
 
         map = new google.maps.Map(document.getElementById('map'), {
             center: loc,
-            zoom: 15
+            zoom: 12
         });
 
         infowindow = new google.maps.InfoWindow();
         var service = new google.maps.places.PlacesService(map);
         service.nearbySearch({
             location: loc,
-            radius: 1000,
+            radius: 8000,
             type: ['gas_station']
         }, callback);
     }
