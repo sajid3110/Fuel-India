@@ -114,8 +114,11 @@
             </div>
             <div class="col-sm-12 col-md-12 col-lg-12 padding-none">
                 <div class=" margin-btm-1" ng-class="{'col-sm-6 col-md-6 col-lg-6': selectedPlace != undefined, 'col-sm-12 col-md-12 col-lg-12': selectedPlace == undefined}">
-                    <div class="map-header">
-                        Nearby Gas stations (Your Location)
+                    <div class="map-header space-between">
+                        <span>Nearby Gas stations (Your Location)</span>
+                        <span>
+                            <button ng-if="routeNavigated" ng-click="resetNearby();" class="btn-xs btn-warning">Reset</button>
+                        </span>
                     </div>
                     <div class="map-content" id="map">
                     </div>
@@ -158,8 +161,8 @@
                             <div class="detail-common-div space-between row">
                                 <button data-toggle="modal" data-target="#picModal" class="btn-sm btn-md btn-primary col-sm-4 col-md-4 col-lg-4">Photos</button>
                                 <button data-toggle="modal" data-target="#revModal" class="btn-sm btn-md btn-success col-sm-4 col-md-4 col-lg-4">Reviews</button>
-                                <button ng-if="!routeNavigated" ng-click="showDirection();" class="btn-sm btn-md btn-info col-sm-4 col-md-4 col-lg-4">Navigate</button>
-                                <button ng-if="routeNavigated" ng-click="resetNearby();" class="btn-sm btn-md btn-warning col-sm-4 col-md-4 col-lg-4">Nearby</button>
+                                <button ng-disabled="routeNavigated" ng-class="{'btn-info': !routeNavigated, 'co-gray': routeNavigated}" ng-click="showDirection();"
+                                    class="btn-sm btn-md col-sm-4 col-md-4 col-lg-4">Navigate</button>
                             </div>
                         </div>
                     </div>
